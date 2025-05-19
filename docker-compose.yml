@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  react-site-app:
+    image: react-site 
+    container_name: react-site-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+    restart: unless-stopped
+
