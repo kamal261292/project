@@ -8,22 +8,22 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Dev') {
             when {
-            branch 'dev'
+                branch 'dev'
             }
             steps {
-                git branch: 'dev', url: 'https://github.com/kamal261292/project-01-guvi.git'
+                git branch: 'dev', url: 'https://github.com/kamal261292/project.git'
             }
         }
 
 
-        stage('Checkout') {
+        stage('Checkout Main') {
             when {
-            branch 'main'
+                branch 'main'
             }
             steps {
-                git branch: 'main', url: 'https://github.com/kamal261292/project-01-guvi.git'
+                git branch: 'main', url: 'https://github.com/kamal261292/project.git'
             }
         }
 
@@ -37,7 +37,7 @@ pipeline {
 
         stage('Build Docker Image') {
             when {
-            branch 'dev'
+                branch 'dev'
             }
             steps {
                 sh 'chmod +x build.sh'
@@ -60,16 +60,16 @@ pipeline {
             }
         }
 
-        stage('push docker image to prod when merge dev to master') {
+        stage('Push Docker Image to Prod on Main') {
             when {
-            branch 'main'
+                branch 'main'
             }
-            steps {  
-             sh """
-                docker pull ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev
-                docker tag ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev ${PROD_IMAGE}:prod
-                docker push ${PROD_IMAGE}:prod
-                docker rmi ${PROD_IMAGE}:prod
+            steps {
+                sh """
+                    docker pull ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev
+                    docker tag ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev ${PROD_IMAGE}:prod
+                    docker push ${PROD_IMAGE}:prod
+                    docker rmi ${PROD_IMAGE}:prod
                 """
             }
         }
