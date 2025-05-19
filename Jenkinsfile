@@ -69,8 +69,8 @@ pipeline {
                 sh """
                     docker pull ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev
                     docker tag ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev ${PROD_IMAGE}:prod
-                    docker push ${PROD_IMAGE}:prod
-                    docker rmi ${PROD_IMAGE}:prod
+                    docker push ${DOCKER_HUB_USERNAME}/${PROD_IMAGE}:prod
+                    docker rmi ${DOCKER_HUB_USERNAME}/${PROD_IMAGE}:prod
                 """
             }
         }
