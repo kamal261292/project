@@ -9,21 +9,15 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            when {
-            branch 'dev'
-            }
             steps {
-                git branch: 'dev', url: 'https://github.com/kamal261292/project-01-guvi.git'
-            }
-        }
-
-
-        stage('Checkout') {
-            when {
-            branch 'main'
-            }
-            steps {
-                git branch: 'main', url: 'https://github.com/kamal261292/project-01-guvi.git'
+                script {
+                    def branchName = env.GIT_BRANCH
+                    if (branchName == 'origin/dev') {
+                        git branch: 'dev', url: 'https://github.com/kamal261292/project.git'
+                    } else if (branchName == 'origin/main') {
+                        git branch: 'main', url: 'https://github.com/kamal261292/project.git'
+                    }
+                }
             }
         }
 
@@ -36,19 +30,15 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            when {
-            branch 'dev'
-            }
+            when { expression { env.GIT_BRANCH == 'origin/dev' } }
             steps {
                 sh 'chmod +x build.sh'
                 sh './build.sh'
             }
         }
 
-        stage('Push Docker Image') {
-            when {
-                branch 'dev'
-            }
+        stage('Push Docker Image to Dev') {
+            when { expression { env.GIT_BRANCH == 'origin/dev' } }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'Docker-hub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                     sh """
@@ -60,16 +50,14 @@ pipeline {
             }
         }
 
-        stage('push docker image to prod when merge dev to master') {
-            when {
-            branch 'main'
-            }
+        stage('Push Docker Image to Prod') {
+            when { expression { env.GIT_BRANCH == 'origin/main' } }
             steps {  
-             sh """
-                docker pull ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev
-                docker tag ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev ${PROD_IMAGE}:prod
-                docker push ${PROD_IMAGE}:prod
-                docker rmi ${PROD_IMAGE}:prod
+                sh """
+                    docker pull ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev
+                    docker tag ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev ${DOCKER_HUB_USERNAME}/${PROD_IMAGE}:prod
+                    docker push ${DOCKER_HUB_USERNAME}/${PROD_IMAGE}:prod
+                    docker rmi ${DOCKER_HUB_USERNAME}/${PROD_IMAGE}:prod
                 """
             }
         }
