@@ -53,7 +53,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'Docker-hub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                     sh """
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push $DOCKER_HUB_USERNAME/$DEV_IMAGE:latest
+                        docker push $DOCKER_HUB_USERNAME/$DEV_IMAGE:dev
                         docker logout
                     """
                 }
@@ -67,8 +67,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'Docker-hub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                 sh """
-                    docker pull ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:latest
-                    docker tag ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:latest ${PROD_IMAGE}:prod
+                    docker pull ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev
+                    docker tag ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev ${PROD_IMAGE}:prod
                     docker push ${DOCKER_HUB_USERNAME}/${PROD_IMAGE}:prod
                     docker rmi ${DOCKER_HUB_USERNAME}/${PROD_IMAGE}:prod
                 """
