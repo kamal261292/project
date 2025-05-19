@@ -65,6 +65,7 @@ pipeline {
                 branch 'main'
             }
             steps {
+                withCredentials([usernamePassword(credentialsId: 'Docker-hub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                 sh """
                     docker pull ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev
                     docker tag ${DOCKER_HUB_USERNAME}/${DEV_IMAGE}:dev ${PROD_IMAGE}:prod
@@ -74,4 +75,5 @@ pipeline {
             }
         }
     }
+}
 }
